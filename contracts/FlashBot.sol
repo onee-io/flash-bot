@@ -1,11 +1,13 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "./interfaces/IFlashBot.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
+import "./interfaces/IUniswapV2Router02.sol";
 
 /// @title 闪电机器人接口实现
 contract FlashBot is IFlashBot {
@@ -45,6 +47,31 @@ contract FlashBot is IFlashBot {
             pairInfoList[i] = getPairInfo(factoryAddress, index);
         }
         return pairInfoList;
+    }
+
+    /// @inheritdoc IFlashBot
+    function computeSwapAmountOut(uint256 amountIn, address[] memory path, address[] memory router)
+        external
+        view
+        override
+        returns (uint256)
+    {
+        require(path.length >= 2, "path error");
+        require(path.length - 1 == router.length, "router error");
+        // 计算兑换金额
+        uint256 _amountIn = amountIn;
+        uint256 _amountOut = 0;
+        for (uint256 i = 0; i < router.length; i++) {
+            address[] memory _path = new address[](2);
+            _path[0] = path[i];
+            _path[1] = path[i + 1];
+            // 通过路由合约计算输出金额
+            uint[] memory amounts = IUniswapV2Router02(router[i]).getAmountsOut(_amountIn, _path);
+            _amountOut = amounts[amounts.length - 1];
+            // 下次兑换的输入金额是本次兑换的输出金额
+            _amountIn = _amountOut; 
+        }
+        return _amountOut;
     }
 
 }

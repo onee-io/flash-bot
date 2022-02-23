@@ -11,7 +11,7 @@ describe("FlashBot", function () {
     let addr1;
     let addrs;
 
-    beforeEach(async function () {
+    before(async function () {
         // 部署机器人合约
         let FlashBot = await ethers.getContractFactory("FlashBot");
         flashBot = await FlashBot.deploy();
@@ -48,5 +48,21 @@ describe("FlashBot", function () {
         expect(pairInfoList[2].token1Address).to.equal("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619");
         expect(pairInfoList[2].token0Symbol).to.equal("USDC");
         expect(pairInfoList[2].token1Symbol).to.equal("WETH");
+    });
+
+    it("computeArbitrageProfit", async function () {
+        let amountIn = 10**15;
+        let path = [
+            "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+            "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+            "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
+        ];
+        let router = [
+            "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
+            "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
+        ];
+        let amountOut = await flashBot.computeSwapAmountOut(amountIn, path, router);
+        console.log("amountIn => ", amountIn);
+        console.log("amountOut => ", amountOut);
     });
 });

@@ -27,4 +27,12 @@ interface IFlashBot {
      * @param endIndex 结束索引（含）
      */
     function batchPairInfo(address factoryAddress, uint256 startIndex, uint256 endIndex) external view returns (PairInfo[] memory);
+
+    /**
+     * @notice 计算兑换输出金额
+     * @param amountIn 输入金额
+     * @param path 兑换路径
+     * @param router 路由合约
+     */
+    function computeSwapAmountOut(uint256 amountIn, address[] memory path, address[] memory router) external view returns (uint256);
 }

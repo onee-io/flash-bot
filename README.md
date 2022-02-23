@@ -17,3 +17,25 @@
 - [x] 批量计算 UniswapV2 类协议多路由**最终**兑换结果（batchSwapAmountOut）
 - [x] 执行 UniswapV2 类协议多路由兑换（executeSwap）
 - [x] 执行 UniswapV2 类协议多路由套利兑换（executeArbitrageSwap）
+
+## 类 UniswapV2 交易所清单
+
+> 数据来源于 DODO 和 DeBank
+
+### Polygon
+
+|  交易所   | Router  | Factory |
+|   ----   |   ----  |  ----   |
+| QuickSwap  | [0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff](https://polygonscan.com/address/0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff) | [0x5757371414417b8c6caad45baef941abc7d3ab32](https://polygonscan.com/address/0x5757371414417b8c6caad45baef941abc7d3ab32) |
+| SushiSwap  | [0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506](https://polygonscan.com/address/0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506) | [0xc35DADB65012eC5796536bD9864eD8773aBc74C4](https://polygonscan.com/address/0xc35DADB65012eC5796536bD9864eD8773aBc74C4) |
+| ComethSwap  | [0x93bcDc45f7e62f89a8e901DC4A0E2c6C427D9F25](https://polygonscan.com/address/0x93bcDc45f7e62f89a8e901DC4A0E2c6C427D9F25) | [0x800b052609c355cA8103E06F022aA30647eAd60a](https://polygonscan.com/address/0x800b052609c355cA8103E06F022aA30647eAd60a) |
+
+## 闪电贷资金清单
+
+### Polygon
+
+|  资金来源   | 手续费  | 接入文档 |
+|   ----   |   ----  |  ----   |
+| AAVE | 0.09% | - |
+| UniswapV2 类协议 | 0.25% | - |
+| DODO | - | [Document](https://dodoex.github.io/docs/zh/docs/flashSwap) |

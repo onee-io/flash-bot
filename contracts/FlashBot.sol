@@ -122,7 +122,11 @@ contract FlashBot is IFlashBot {
         uint256[] memory amounts = computeSwapAmountsOut(param);
         // 判断回来的代币数量要大于支付的数量
         require(amounts[amounts.length - 1] > amounts[0], "NO ARBITRAGE");
+        uint256 beforeBalance = IERC20(param.path[0]).balanceOf(msg.sender);
         _swap(amounts, param.path, param.router);
+        // 校验钱包余额 确认套利成功 否则交易revert
+        uint256 afterBalance = IERC20(param.path[0]).balanceOf(msg.sender);
+        require(afterBalance > beforeBalance, "ARBITRAGE FAILURE");
     }
 
     /**

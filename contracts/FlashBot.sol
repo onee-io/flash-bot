@@ -8,6 +8,7 @@ import "./interfaces/IFlashBot.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IUniswapV2Router02.sol";
+import "./libraries/UniswapV2Library.sol";
 
 /// @title 闪电机器人接口实现
 contract FlashBot is IFlashBot {
@@ -40,7 +41,7 @@ contract FlashBot is IFlashBot {
         override
         returns (PairInfo[] memory) 
     {
-        require(endIndex >= startIndex, "index error");
+        require(endIndex >= startIndex, "INDEX ERROR");
         PairInfo[] memory pairInfoList = new PairInfo[](endIndex - startIndex + 1);
         for (uint256 i = 0; i < pairInfoList.length; i++) {
             uint256 index = i + startIndex;
@@ -56,8 +57,8 @@ contract FlashBot is IFlashBot {
         override
         returns (uint256[] memory) 
     {
-        require(param.path.length >= 2, "path error");
-        require(param.path.length - 1 == param.router.length, "router error");
+        require(param.path.length >= 2, "PATH ERROR");
+        require(param.path.length - 1 == param.router.length, "ROUTER ERROR");
         // 计算兑换金额
         uint256[] memory _amounts = new uint256[](param.path.length);
         _amounts[0] = param.amountIn;
@@ -102,6 +103,58 @@ contract FlashBot is IFlashBot {
         external
         override
     {
-        
+        uint256[] memory amounts = computeSwapAmountsOut(param);
+        _swap(amounts, param.path, param.router);
+    }
+
+    /// @inheritdoc IFlashBot
+    function executeArbitrageSwap(SwapParam calldata param)
+        external
+        override
+    {
+        require(param.path.length >= 3, "PATH ERROR");
+        require(param.path[0] == param.path[param.path.length - 1], "TOKEN ERROR");
+        uint256[] memory amounts = computeSwapAmountsOut(param);
+        // 判断回来的代币数量要大于支付的数量
+        require(amounts[amounts.length - 1] > amounts[0], "NO ARBITRAGE");
+        _swap(amounts, param.path, param.router);
+    }
+
+    /**
+     * @notice 多路由兑换（需要提前把初始金额转入第一个流动池合约）
+     * @param amounts 兑换金额
+     * @param path 兑换路径
+     * @param router 路由合约
+     */
+    function _swap(uint[] memory amounts, address[] memory path, address[] memory router) internal virtual {
+        // 把初始金额转入第一个流动池合约
+        address pair = _getPairAddress(router[0], path[0], path[1]);
+        IERC20(path[0]).transferFrom(msg.sender, pair, amounts[0]);
+        // 多路由兑换
+        for (uint256 i; i < router.length; i++) {
+            (address input, address output) = (path[i], path[i + 1]);
+            (address token0,) = UniswapV2Library.sortTokens(input, output);
+            uint256 amountOut = amounts[i + 1];
+            (uint256 amount0Out, uint256 amount1Out) = input == token0 ? (uint256(0), amountOut) : (amountOut, uint256(0));
+            address to = i < router.length - 1 ? _getPairAddress(router[i + 1], output, path[i + 2]) : msg.sender;
+            IUniswapV2Pair(_getPairAddress(router[i], input, output)).swap(
+                amount0Out, amount1Out, to, new bytes(0)
+            );
+        }
+    }
+
+    /**
+     * @notice 获取流动池合约地址
+     * @param router 路由合约
+     * @param token0 代币0
+     * @param token1 代币1
+     */
+    function _getPairAddress(address router, address token0, address token1) 
+        internal
+        view
+        returns (address)
+    {
+        address factory = IUniswapV2Router02(router).factory();
+        return IUniswapV2Factory(factory).getPair(token0, token1);
     }
 }

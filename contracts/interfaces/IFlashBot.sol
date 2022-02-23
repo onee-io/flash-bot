@@ -70,4 +70,10 @@ interface IFlashBot {
      * @param param 兑换参数
      */
     function executeSwap(SwapParam calldata param) external;
+
+    /**
+     * @notice 执行套利兑换
+     * @param param 兑换参数
+     */
+    function executeArbitrageSwap(SwapParam calldata param) external;
 }

@@ -14,6 +14,6 @@
 - [x] 批量查询 UniswapV2 类协议流动池信息（batchPairInfo）
 - [x] 计算 UniswapV2 类协议多路由**每步**兑换数量（computeSwapAmountsOut）
 - [x] 计算 UniswapV2 类协议多路由**最终**兑换数量（computeSwapAmountOut）
-- [x] 批量计算 UniswapV2 类协议多路由**最钟**兑换结果（batchSwapAmountOut）
+- [x] 批量计算 UniswapV2 类协议多路由**最终**兑换结果（batchSwapAmountOut）
 - [x] 执行 UniswapV2 类协议多路由兑换（executeSwap）
 - [x] 执行 UniswapV2 类协议多路由套利兑换（executeArbitrageSwap）

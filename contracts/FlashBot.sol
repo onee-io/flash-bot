@@ -9,6 +9,7 @@ import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 import "./libraries/UniswapV2Library.sol";
+import "./libraries/SafeCall.sol";
 
 /// @title 闪电机器人接口实现
 contract FlashBot is IFlashBot {
@@ -22,9 +23,9 @@ contract FlashBot is IFlashBot {
     {
         address pairAddress = IUniswapV2Factory(factoryAddress).allPairs(index);
         address token0Address = IUniswapV2Pair(pairAddress).token0();
-        string memory token0Symbol = IERC20Metadata(token0Address).symbol();
+        string memory token0Symbol = SafeCall.symbol(token0Address);
         address token1Address = IUniswapV2Pair(pairAddress).token1();
-        string memory token1Symbol = IERC20Metadata(token1Address).symbol();
+        string memory token1Symbol = SafeCall.symbol(token1Address);
         return PairInfo({
             pairAddress: pairAddress,
             token0Address: token0Address,
@@ -75,7 +76,7 @@ contract FlashBot is IFlashBot {
 
     /// @inheritdoc IFlashBot
     function computeSwapAmountOut(SwapParam calldata param)
-        public
+        external
         view
         override
         returns (uint256)
@@ -93,7 +94,11 @@ contract FlashBot is IFlashBot {
     {
         uint256[] memory amountOutList = new uint256[](paramList.length);
         for (uint256 i = 0; i < paramList.length; i++) {
-            amountOutList[i] = computeSwapAmountOut(paramList[i]);
+            try this.computeSwapAmountOut(paramList[i]) returns (uint256 amount) {
+                amountOutList[i] = amount;
+            } catch {
+                amountOutList[i] = 0;
+            }
         }
         return amountOutList;
     }

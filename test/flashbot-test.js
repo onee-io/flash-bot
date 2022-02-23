@@ -50,7 +50,24 @@ describe("FlashBot", function () {
         expect(pairInfoList[2].token1Symbol).to.equal("WETH");
     });
 
-    it("computeArbitrageProfit", async function () {
+    it("computeSwapAmountsOut", async function () {
+        let param = {
+            amountIn: 10**15,
+            path: [
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
+            ],
+            router: [
+                "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
+                "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
+            ]
+        }
+        let amounts = await flashBot.computeSwapAmountsOut(param);
+        console.log("amounts => ", amounts);
+    });
+
+    it("computeSwapAmountOut", async function () {
         let param = {
             amountIn: 10**15,
             path: [

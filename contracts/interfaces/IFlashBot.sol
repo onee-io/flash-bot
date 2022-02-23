@@ -48,14 +48,26 @@ interface IFlashBot {
     }
 
     /**
-     * @notice 计算兑换输出金额
+     * @notice 计算多路由兑换数量
      * @param param 兑换参数
      */
-    function computeSwapAmountOut(SwapParam memory param) external view returns (uint256);
+    function computeSwapAmountsOut(SwapParam calldata param) external view returns (uint256[] memory);
 
     /**
-     * @notice 批量计算兑换输出金额
+     * @notice 计算多路由兑换最终输出金额
+     * @param param 兑换参数
+     */
+    function computeSwapAmountOut(SwapParam calldata param) external view returns (uint256);
+
+    /**
+     * @notice 批量计算多路由兑换最终输出金额
      * @param paramList 兑换参数列表
      */
-    function batchSwapAmountOut(SwapParam[] memory paramList) external view returns (uint256[] memory);
+    function batchSwapAmountOut(SwapParam[] calldata paramList) external view returns (uint256[] memory);
+
+    /**
+     * @notice 执行兑换
+     * @param param 兑换参数
+     */
+    function executeSwap(SwapParam calldata param) external;
 }

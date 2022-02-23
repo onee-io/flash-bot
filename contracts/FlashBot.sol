@@ -50,32 +50,41 @@ contract FlashBot is IFlashBot {
     }
 
     /// @inheritdoc IFlashBot
-    function computeSwapAmountOut(SwapParam memory param)
+    function computeSwapAmountsOut(SwapParam calldata param)
         public
         view
         override
-        returns (uint256)
+        returns (uint256[] memory) 
     {
         require(param.path.length >= 2, "path error");
         require(param.path.length - 1 == param.router.length, "router error");
         // 计算兑换金额
-        uint256 _amountIn = param.amountIn;
-        uint256 _amountOut = 0;
+        uint256[] memory _amounts = new uint256[](param.path.length);
+        _amounts[0] = param.amountIn;
         for (uint256 i = 0; i < param.router.length; i++) {
             address[] memory _path = new address[](2);
             _path[0] = param.path[i];
             _path[1] = param.path[i + 1];
             // 通过路由合约计算输出金额
-            uint[] memory amounts = IUniswapV2Router02(param.router[i]).getAmountsOut(_amountIn, _path);
-            _amountOut = amounts[amounts.length - 1];
-            // 下次兑换的输入金额是本次兑换的输出金额
-            _amountIn = _amountOut; 
+            uint[] memory amounts = IUniswapV2Router02(param.router[i]).getAmountsOut(_amounts[i], _path);
+            _amounts[i + 1] = amounts[amounts.length - 1];
         }
-        return _amountOut;
+        return _amounts;
     }
 
     /// @inheritdoc IFlashBot
-    function batchSwapAmountOut(SwapParam[] memory paramList)
+    function computeSwapAmountOut(SwapParam calldata param)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        uint256[] memory amounts = computeSwapAmountsOut(param);
+        return amounts[amounts.length - 1];
+    }
+
+    /// @inheritdoc IFlashBot
+    function batchSwapAmountOut(SwapParam[] calldata paramList)
         external
         view
         override
@@ -88,4 +97,11 @@ contract FlashBot is IFlashBot {
         return amountOutList;
     }
 
+    /// @inheritdoc IFlashBot
+    function executeSwap(SwapParam calldata param)
+        external
+        override
+    {
+        
+    }
 }

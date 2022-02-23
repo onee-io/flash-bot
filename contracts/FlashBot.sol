@@ -121,7 +121,7 @@ contract FlashBot is IFlashBot {
     }
 
     /**
-     * @notice 多路由兑换（需要提前把初始金额转入第一个流动池合约）
+     * @notice 多路由兑换
      * @param amounts 兑换金额
      * @param path 兑换路径
      * @param router 路由合约

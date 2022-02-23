@@ -50,28 +50,42 @@ contract FlashBot is IFlashBot {
     }
 
     /// @inheritdoc IFlashBot
-    function computeSwapAmountOut(uint256 amountIn, address[] memory path, address[] memory router)
-        external
+    function computeSwapAmountOut(SwapParam memory param)
+        public
         view
         override
         returns (uint256)
     {
-        require(path.length >= 2, "path error");
-        require(path.length - 1 == router.length, "router error");
+        require(param.path.length >= 2, "path error");
+        require(param.path.length - 1 == param.router.length, "router error");
         // 计算兑换金额
-        uint256 _amountIn = amountIn;
+        uint256 _amountIn = param.amountIn;
         uint256 _amountOut = 0;
-        for (uint256 i = 0; i < router.length; i++) {
+        for (uint256 i = 0; i < param.router.length; i++) {
             address[] memory _path = new address[](2);
-            _path[0] = path[i];
-            _path[1] = path[i + 1];
+            _path[0] = param.path[i];
+            _path[1] = param.path[i + 1];
             // 通过路由合约计算输出金额
-            uint[] memory amounts = IUniswapV2Router02(router[i]).getAmountsOut(_amountIn, _path);
+            uint[] memory amounts = IUniswapV2Router02(param.router[i]).getAmountsOut(_amountIn, _path);
             _amountOut = amounts[amounts.length - 1];
             // 下次兑换的输入金额是本次兑换的输出金额
             _amountIn = _amountOut; 
         }
         return _amountOut;
+    }
+
+    /// @inheritdoc IFlashBot
+    function batchSwapAmountOut(SwapParam[] memory paramList)
+        external
+        view
+        override
+        returns (uint256[] memory)
+    {
+        uint256[] memory amountOutList = new uint256[](paramList.length);
+        for (uint256 i = 0; i < paramList.length; i++) {
+            amountOutList[i] = computeSwapAmountOut(paramList[i]);
+        }
+        return amountOutList;
     }
 
 }

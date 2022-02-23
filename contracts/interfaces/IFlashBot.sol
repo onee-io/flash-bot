@@ -4,12 +4,19 @@ pragma solidity ^0.8.0;
 /// @title 闪电机器人接口定义
 interface IFlashBot {
 
-    /// 流动池信息
+    /**
+     * 流动池信息
+     */
     struct PairInfo {
+        // 流动池合约
         address pairAddress;
+        // token0 合约
         address token0Address;
+        // token1 合约
         address token1Address;
+        // token0 代币符号
         string token0Symbol;
+        // token1 代币符号
         string token1Symbol;
     }
 
@@ -29,10 +36,26 @@ interface IFlashBot {
     function batchPairInfo(address factoryAddress, uint256 startIndex, uint256 endIndex) external view returns (PairInfo[] memory);
 
     /**
-     * @notice 计算兑换输出金额
-     * @param amountIn 输入金额
-     * @param path 兑换路径
-     * @param router 路由合约
+     * 兑换参数
      */
-    function computeSwapAmountOut(uint256 amountIn, address[] memory path, address[] memory router) external view returns (uint256);
+    struct SwapParam {
+        // 输入金额
+        uint256 amountIn;
+        // 兑换路径
+        address[] path;
+        // 路由合约
+        address[] router;
+    }
+
+    /**
+     * @notice 计算兑换输出金额
+     * @param param 兑换参数
+     */
+    function computeSwapAmountOut(SwapParam memory param) external view returns (uint256);
+
+    /**
+     * @notice 批量计算兑换输出金额
+     * @param paramList 兑换参数列表
+     */
+    function batchSwapAmountOut(SwapParam[] memory paramList) external view returns (uint256[] memory);
 }

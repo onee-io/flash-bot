@@ -51,18 +51,51 @@ describe("FlashBot", function () {
     });
 
     it("computeArbitrageProfit", async function () {
-        let amountIn = 10**15;
-        let path = [
-            "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
-            "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-            "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
-        ];
-        let router = [
-            "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
-            "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
-        ];
-        let amountOut = await flashBot.computeSwapAmountOut(amountIn, path, router);
-        console.log("amountIn => ", amountIn);
+        let param = {
+            amountIn: 10**15,
+            path: [
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
+            ],
+            router: [
+                "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
+                "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
+            ]
+        }
+        let amountOut = await flashBot.computeSwapAmountOut(param);
+        console.log("amountIn => ", param.amountIn);
         console.log("amountOut => ", amountOut);
+    });
+
+    it("batchSwapAmountOut", async function () {
+        let param1 = {
+            amountIn: 10**10,
+            path: [
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
+            ],
+            router: [
+                "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
+                "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
+            ]
+        }
+        let param2 = {
+            amountIn: 10**15,
+            path: [
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
+                "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" // WETH
+            ],
+            router: [
+                "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // QuickSwap
+                "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506" // SushiSwap
+            ]
+        }
+        let paramList = [param1, param2];
+        let amountOutList = await flashBot.batchSwapAmountOut(paramList);
+        console.log("amountOut[0] => ", amountOutList[0]);
+        console.log("amountOut[1] => ", amountOutList[1]);
     });
 });

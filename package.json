@@ -7,5 +7,9 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.4",
     "hardhat": "^2.8.4"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0",
+    "dotenv": "^16.0.0"
   }
 }

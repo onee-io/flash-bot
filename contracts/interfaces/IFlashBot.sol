@@ -19,4 +19,12 @@ interface IFlashBot {
      * @param index 流动池索引
      */
     function getPairInfo(address factoryAddress, uint256 index) external view returns (PairInfo memory);
+
+    /**
+     * @notice 批量查询流动池信息
+     * @param factoryAddress 工厂合约地址
+     * @param startIndex 起始索引（含）
+     * @param endIndex 结束索引（含）
+     */
+    function batchPairInfo(address factoryAddress, uint256 startIndex, uint256 endIndex) external view returns (PairInfo[] memory);
 }

@@ -12,7 +12,7 @@ contract FlashBot is IFlashBot {
 
     /// @inheritdoc IFlashBot
     function getPairInfo(address factoryAddress, uint256 index)
-        external
+        public
         view
         override
         returns (PairInfo memory)
@@ -23,11 +23,28 @@ contract FlashBot is IFlashBot {
         address token1Address = IUniswapV2Pair(pairAddress).token1();
         string memory token1Symbol = IERC20Metadata(token1Address).symbol();
         return PairInfo({
-                pairAddress: pairAddress,
-                token0Address: token0Address,
-                token0Symbol: token0Symbol,
-                token1Address: token1Address,
-                token1Symbol: token1Symbol
-            });
+            pairAddress: pairAddress,
+            token0Address: token0Address,
+            token0Symbol: token0Symbol,
+            token1Address: token1Address,
+            token1Symbol: token1Symbol
+        });
     }
+
+    /// @inheritdoc IFlashBot
+    function batchPairInfo(address factoryAddress, uint256 startIndex, uint256 endIndex)
+        external
+        view
+        override
+        returns (PairInfo[] memory) 
+    {
+        require(endIndex >= startIndex, "index error");
+        PairInfo[] memory pairInfoList = new PairInfo[](endIndex - startIndex + 1);
+        for (uint256 i = 0; i < pairInfoList.length; i++) {
+            uint256 index = i + startIndex;
+            pairInfoList[i] = getPairInfo(factoryAddress, index);
+        }
+        return pairInfoList;
+    }
+
 }

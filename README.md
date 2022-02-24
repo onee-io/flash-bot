@@ -6,7 +6,7 @@
 
 ## 部署信息
 
-- Polygon: [0xF0798939453241ac407012855Ee80c9b043BE822](https://polygonscan.com/address/0xF0798939453241ac407012855Ee80c9b043BE822)
+- Polygon: [0xbabac2ac0369E806F28EE7CFe1c7BF02D5f6d548](https://polygonscan.com/address/0xbabac2ac0369E806F28EE7CFe1c7BF02D5f6d548)
 
 ## 功能支持
 

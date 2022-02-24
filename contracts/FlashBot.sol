@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./interfaces/IFlashBot.sol";
 import "./interfaces/IUniswapV2Factory.sol";
@@ -13,6 +14,7 @@ import "./libraries/SafeCall.sol";
 
 /// @title 闪电机器人接口实现
 contract FlashBot is IFlashBot {
+    using SafeMath for uint;
 
     /// @inheritdoc IFlashBot
     function getPairInfo(address factoryAddress, uint256 index)
@@ -82,7 +84,29 @@ contract FlashBot is IFlashBot {
         returns (uint256)
     {
         uint256[] memory amounts = computeSwapAmountsOut(param);
-        return amounts[amounts.length - 1];
+        // 依次检查每步实际是否可兑换 防止无法兑换白白消耗 Gas 费
+        // 对于无法转账的代币 以下校验规则拦不住 因为下面"amountIn"有值 而实际没有 所以只能在数据库里把代币拉黑
+        for (uint256 i = 0; i < param.router.length; i++) {
+            (address input, address output) = (param.path[i], param.path[i + 1]);
+            (address token0,) = UniswapV2Library.sortTokens(input, output);
+            (uint256 amount0In, uint256 amount1In) = input == token0 ? (amounts[i], uint256(0)) : (uint256(0), amounts[i]);
+            (uint256 amount0Out, uint256 amount1Out) = input == token0 ? (uint256(0), amounts[i + 1]) : (amounts[i + 1], uint256(0));
+            address pairAddress = _getPairAddress(param.router[i], input, output);
+            (uint112 _reserve0, uint112 _reserve1,) = IUniswapV2Pair(pairAddress).getReserves();
+            require(amount0Out < _reserve0 && amount1Out < _reserve1, 'FlashBot: INSUFFICIENT_LIQUIDITY');
+            uint balance0;
+            uint balance1;
+            {// scope for _token{0,1}, avoids stack too deep errors
+                balance0 = IERC20Metadata(IUniswapV2Pair(pairAddress).token0()).balanceOf(pairAddress) + amount0In - amount0Out;
+                balance1 = IERC20Metadata(IUniswapV2Pair(pairAddress).token1()).balanceOf(pairAddress) + amount1In - amount1Out;
+            }
+            {// scope for reserve{0,1}Adjusted, avoids stack too deep errors
+                uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(3));
+                uint balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(3));
+                require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'FlashBot: K');
+            }
+        }
+        return amounts[amounts.length - 1];       
     }
 
     /// @inheritdoc IFlashBot

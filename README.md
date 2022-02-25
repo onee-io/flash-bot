@@ -21,6 +21,8 @@
 ## 类 UniswapV2 交易所清单
 
 > 数据来源于 DODO 和 DeBank
+> `*` 不支持金额计算
+> `#` 不确定支持闪电兑换
 
 ### Polygon
 
@@ -34,11 +36,11 @@
 | ApeSwap | [0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607](https://polygonscan.com/address/0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607) | [0xCf083Be4164828f00cAE704EC15a36D711491284](https://polygonscan.com/address/0xCf083Be4164828f00cAE704EC15a36D711491284)|
 | JetSwap | [0x5C6EC38fb0e2609672BDf628B1fD605A523E5923](https://polygonscan.com/address/0x5C6EC38fb0e2609672BDf628B1fD605A523E5923) | [0x668ad0ed2622C62E24f0d5ab6B6Ac1b9D2cD4AC7](https://polygonscan.com/address/0x668ad0ed2622C62E24f0d5ab6B6Ac1b9D2cD4AC7)|
 | Gravity | [0x57dE98135e8287F163c59cA4fF45f1341b680248](https://polygonscan.com/address/0x57dE98135e8287F163c59cA4fF45f1341b680248) | [0x3ed75AfF4094d2Aaa38FaFCa64EF1C152ec1Cf20](https://polygonscan.com/address/0x3ed75AfF4094d2Aaa38FaFCa64EF1C152ec1Cf20)|
-| DinoSwap | [0x6AC823102CB347e1f5925C634B80a98A3aee7E03](https://polygonscan.com/address/0x6AC823102CB347e1f5925C634B80a98A3aee7E03) | [0x624Ccf581371F8A4493e6AbDE46412002555A1b6](https://polygonscan.com/address/0x624Ccf581371F8A4493e6AbDE46412002555A1b6)|
+| #DinoSwap | [0x6AC823102CB347e1f5925C634B80a98A3aee7E03](https://polygonscan.com/address/0x6AC823102CB347e1f5925C634B80a98A3aee7E03) | [0x624Ccf581371F8A4493e6AbDE46412002555A1b6](https://polygonscan.com/address/0x624Ccf581371F8A4493e6AbDE46412002555A1b6)|
 | Polycat | [0x94930a328162957FF1dd48900aF67B5439336cBD](https://polygonscan.com/address/0x94930a328162957FF1dd48900aF67B5439336cBD) | [0x477Ce834Ae6b7aB003cCe4BC4d8697763FF456FA](https://polygonscan.com/address/0x477Ce834Ae6b7aB003cCe4BC4d8697763FF456FA)|
 | Elk | [0xf38a7A7Ac2D745E2204c13F824c00139DF831FFf](https://polygonscan.com/address/0xf38a7A7Ac2D745E2204c13F824c00139DF831FFf) | [0xE3BD06c7ac7E1CeB17BdD2E5BA83E40D1515AF2a](https://polygonscan.com/address/0xE3BD06c7ac7E1CeB17BdD2E5BA83E40D1515AF2a)|
-| TetuSwap | [0x736FD9EabB15776A3adfea1B975c868F72A29d14](https://polygonscan.com/address/0x736FD9EabB15776A3adfea1B975c868F72A29d14) | [0x684d8c187be836171a1Af8D533e4724893031828](https://polygonscan.com/address/0x684d8c187be836171a1Af8D533e4724893031828)|
-| Smartdex | [0x6f5fE5Fef0186f7B27424679cbb17e45df6e2118](https://polygonscan.com/address/0x6f5fE5Fef0186f7B27424679cbb17e45df6e2118) | [0xBE087BeD88539d28664c9998FE3f180ea7b9749C](https://polygonscan.com/address/0xBE087BeD88539d28664c9998FE3f180ea7b9749C)|
+| #TetuSwap | [0x736FD9EabB15776A3adfea1B975c868F72A29d14](https://polygonscan.com/address/0x736FD9EabB15776A3adfea1B975c868F72A29d14) | [0x684d8c187be836171a1Af8D533e4724893031828](https://polygonscan.com/address/0x684d8c187be836171a1Af8D533e4724893031828)|
+| #Smartdex | [0x6f5fE5Fef0186f7B27424679cbb17e45df6e2118](https://polygonscan.com/address/0x6f5fE5Fef0186f7B27424679cbb17e45df6e2118) | [0xBE087BeD88539d28664c9998FE3f180ea7b9749C](https://polygonscan.com/address/0xBE087BeD88539d28664c9998FE3f180ea7b9749C)|
 | CafeSwap | [0x9055682E58C74fc8DdBFC55Ad2428aB1F96098Fc](https://polygonscan.com/address/0x9055682E58C74fc8DdBFC55Ad2428aB1F96098Fc) | [0x5eDe3f4e7203Bf1F12d57aF1810448E5dB20f46C](https://polygonscan.com/address/0x5eDe3f4e7203Bf1F12d57aF1810448E5dB20f46C)|
 | *Polydex | [0xC60aE14F2568b102F8Ca6266e8799112846DD088](https://polygonscan.com/address/0xC60aE14F2568b102F8Ca6266e8799112846DD088) | [0xEAA98F7b5f7BfbcD1aF14D0efAa9d9e68D82f640](https://polygonscan.com/address/0xEAA98F7b5f7BfbcD1aF14D0efAa9d9e68D82f640)|
 
@@ -50,5 +52,5 @@
 |   ----   |   ----  |  ----   |
 | AAVE | 0.09% | - |
 | Balancer | - | - |
-| UniswapV2 类协议 | 0.25% | - |
-| DODO | - | [](https://dodoex.github.io/docs/zh/docs/flashSwap) |
+| UniswapV2 类协议 | 0.3% | [https://www.jianshu.com/p/b715e065603e](https://www.jianshu.com/p/b715e065603e) |
+| DODO | - | [https://www.jianshu.com/p/b715e065603e](https://dodoex.github.io/docs/zh/docs/flashSwap) |

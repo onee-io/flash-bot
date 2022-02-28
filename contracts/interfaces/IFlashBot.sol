@@ -4,6 +4,10 @@ pragma solidity ^0.8.0;
 /// @title 闪电机器人接口定义
 interface IFlashBot {
 
+    /**************************************************************************
+     *                              聚合信息查询                                *
+     **************************************************************************/
+
     /**
      * 流动池信息
      */
@@ -18,6 +22,10 @@ interface IFlashBot {
         string token0Symbol;
         // token1 代币符号
         string token1Symbol;
+        // token0 储备量
+        uint112 reserve0;
+        // token1 储备量
+        uint112 reserve1;
     }
 
     /**
@@ -34,6 +42,10 @@ interface IFlashBot {
      * @param endIndex 结束索引（含）
      */
     function batchPairInfo(address factoryAddress, uint256 startIndex, uint256 endIndex) external view returns (PairInfo[] memory);
+
+    /**************************************************************************
+     *                                 执行套利                                *
+     **************************************************************************/
 
     /**
      * 兑换参数
@@ -66,14 +78,54 @@ interface IFlashBot {
     function batchSwapAmountOut(SwapParam[] calldata paramList) external view returns (uint256[] memory);
 
     /**
-     * @notice 执行兑换
+     * @notice 执行兑换 (msg.sender 需要本金及提前授权)
      * @param param 兑换参数
      */
     function executeSwap(SwapParam calldata param) external;
 
     /**
-     * @notice 执行套利兑换
+     * @notice 执行套利兑换 (msg.sender 需要本金及提前授权)
      * @param param 兑换参数
      */
     function executeArbitrageSwap(SwapParam calldata param) external;
+
+    /**
+     * @notice 执行闪电兑换 (无需本金)
+     * @param param 兑换参数
+     */
+    function executeFlashSwap(SwapParam calldata param) external;
+
+    /**
+     * @notice 执行套利闪电兑换 (无需本金)
+     * @param param 兑换参数
+     */
+    function executeArbitrageFlashSwap(SwapParam calldata param) external;
+
+    /**************************************************************************
+     *                                   提款                                  *
+     **************************************************************************/
+
+    /**
+     * @notice 合约余额提款到 owner
+     */
+    function withdraw() external;
+
+    /**
+     * @notice 合约余额提款到指定地址
+     * @param to 接收地址
+     */
+    function withdrawTo(address to) external;
+
+    /**
+     * @notice 合约代币余额提款到 owner
+     * @param tokens 代币列表
+     */
+    function withdrawToken(address[] calldata tokens) external;
+
+    /**
+     * @notice 合约代币余额提款到 owner
+     * @param tokens 代币列表
+     * @param to 接收地址
+     */
+    function withdrawToken(address[] calldata tokens, address to) external;
 }

@@ -2,10 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./interfaces/IFlashBot.sol";
+import "./interfaces/IUniswapV2Callee.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IUniswapV2Router02.sol";
@@ -13,8 +15,14 @@ import "./libraries/UniswapV2Library.sol";
 import "./libraries/SafeCall.sol";
 
 /// @title 闪电机器人接口实现
-contract FlashBot is IFlashBot {
+contract FlashBot is IFlashBot, IUniswapV2Callee, Ownable {
     using SafeMath for uint;
+
+    fallback() external payable {
+    }
+
+    receive() external payable {
+    }
 
     /// @inheritdoc IFlashBot
     function getPairInfo(address factoryAddress, uint256 index)
@@ -28,12 +36,15 @@ contract FlashBot is IFlashBot {
         string memory token0Symbol = SafeCall.symbol(token0Address);
         address token1Address = IUniswapV2Pair(pairAddress).token1();
         string memory token1Symbol = SafeCall.symbol(token1Address);
+        (uint112 reserve0, uint112 reserve1,) = IUniswapV2Pair(pairAddress).getReserves();
         return PairInfo({
             pairAddress: pairAddress,
             token0Address: token0Address,
             token0Symbol: token0Symbol,
+            reserve0: reserve0,
             token1Address: token1Address,
-            token1Symbol: token1Symbol
+            token1Symbol: token1Symbol,
+            reserve1: reserve1
         });
     }
 
@@ -97,8 +108,8 @@ contract FlashBot is IFlashBot {
             uint balance0;
             uint balance1;
             {// scope for _token{0,1}, avoids stack too deep errors
-                balance0 = IERC20Metadata(IUniswapV2Pair(pairAddress).token0()).balanceOf(pairAddress) + amount0In - amount0Out;
-                balance1 = IERC20Metadata(IUniswapV2Pair(pairAddress).token1()).balanceOf(pairAddress) + amount1In - amount1Out;
+                balance0 = IERC20(IUniswapV2Pair(pairAddress).token0()).balanceOf(pairAddress) + amount0In - amount0Out;
+                balance1 = IERC20(IUniswapV2Pair(pairAddress).token1()).balanceOf(pairAddress) + amount1In - amount1Out;
             }
             {// scope for reserve{0,1}Adjusted, avoids stack too deep errors
                 uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(3));
@@ -153,6 +164,112 @@ contract FlashBot is IFlashBot {
         require(afterBalance > beforeBalance, "ARBITRAGE FAILURE");
     }
 
+    /// @inheritdoc IFlashBot
+    function executeFlashSwap(SwapParam calldata param)
+        external
+        override
+    {
+        // TODO 
+    }
+
+    /// @inheritdoc IFlashBot
+    function executeArbitrageFlashSwap(SwapParam calldata param)
+        external
+        override
+    {
+        // TODO
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function uniswapV2Call(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function waultSwapCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function apeCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function jetswapCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function elkCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IUniswapV2Callee
+    function cafeCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        external
+        override
+    {
+        _flashSwapCall(sender, amount0, amount1, data);
+    }
+
+    /// @inheritdoc IFlashBot
+    function withdraw()
+        external
+        override
+        onlyOwner
+    {
+        withdrawTo(owner());
+    }
+
+    /// @inheritdoc IFlashBot
+    function withdrawTo(address to)
+        public
+        override
+        onlyOwner
+    {
+        require(address(this).balance > 0, "INSUFFICIENT BALANCE");
+        payable(to).transfer(address(this).balance);
+    }
+
+    /// @inheritdoc IFlashBot
+    function withdrawToken(address[] calldata tokens)
+        external
+        override
+        onlyOwner
+    {
+        withdrawToken(tokens, owner());
+    }
+
+    /// @inheritdoc IFlashBot
+    function withdrawToken(address[] calldata tokens, address to)
+        public
+        override
+        onlyOwner
+    {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            uint256 balance = IERC20(tokens[i]).balanceOf(address(this));
+            if (balance > 0) {
+                IERC20(tokens[i]).transferFrom(address(this), to, balance);
+            }
+        }
+    }
+
     /**
      * @notice 多路由兑换
      * @param amounts 兑换金额
@@ -174,6 +291,19 @@ contract FlashBot is IFlashBot {
                 amount0Out, amount1Out, to, new bytes(0)
             );
         }
+    }
+
+    /**
+     * @notice 闪电兑换执行逻辑
+     * @param sender 资金来源 pair 合约
+     * @param amount0 借出token0数量
+     * @param amount1 借出token1数量
+     * @param data 附加数据
+     */
+    function _flashSwapCall(address sender, uint amount0, uint amount1, bytes calldata data)
+        internal
+    {
+        // TODO
     }
 
     /**

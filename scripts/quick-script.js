@@ -80,7 +80,7 @@ async function main() {
     let flashBotAddress = "0xF0798939453241ac407012855Ee80c9b043BE822";
 
     // 授权代币
-    // await approve(token0Address, flashBotAddress);
+    await approve(token0Address, flashBotAddress);
 
     // 多路由套利兑换
     let amountIn = ethers.BigNumber.from("10000000000000000000");

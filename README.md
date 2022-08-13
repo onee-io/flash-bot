@@ -2,7 +2,9 @@
 
 闪电交易机器人，通过合约在一笔交易中完成多个 DEX 之间搬砖套利。
 
-参考机器人: [https://cn.etherscan.com/address/0x5aa3393e361c2eb342408559309b3e873cd876d6](https://cn.etherscan.com/address/0x5aa3393e361c2eb342408559309b3e873cd876d6)
+兑换路径: A Token -> B Token -> A Token
+
+参考机器人: [0x5aa3393e361c2eb342408559309b3e873cd876d6](https://etherscan.io/address/0x5aa3393e361c2eb342408559309b3e873cd876d6)
 
 ## 部署信息
 
@@ -17,11 +19,22 @@
 - [x] 批量计算 UniswapV2 类协议多路由**最终**兑换结果（batchSwapAmountOut）
 - [x] 执行 UniswapV2 类协议多路由兑换（executeSwap）
 - [x] 执行 UniswapV2 类协议多路由套利兑换（executeArbitrageSwap）
+- [ ] 借用闪电贷执行 UniswapV2 类协议多路由兑换（executeFlashSwap）
+- [ ] 借用闪电贷执行 UniswapV2 类协议多路由套利兑换（executeArbitrageFlashSwap）
+
+## 使用方式
+
+1. 将 `.env_template` 改为 `.env`, 填写好私钥及节点信息；
+2. 参考 [quick-script.js](./scripts/quick-script.js) 实现自己的 DEX 套利交易。
+
+*注：执行 `executeSwap` 或 `executeArbitrageSwap` 需保证发起交易的地址有对应的 Token 并且已授权给机器人合约。
 
 ## 类 UniswapV2 交易所清单
 
 > 数据来源于 DODO 和 DeBank
+>
 > `*` 不支持金额计算
+>
 > `#` 不确定支持闪电兑换
 
 ### Polygon
@@ -53,4 +66,4 @@
 | AAVE | 0.09% | - |
 | Balancer | - | - |
 | UniswapV2 类协议 | 0.3% | [https://www.jianshu.com/p/b715e065603e](https://www.jianshu.com/p/b715e065603e) |
-| DODO | - | [https://www.jianshu.com/p/b715e065603e](https://dodoex.github.io/docs/zh/docs/flashSwap) |
+| DODO | - | [https://dodoex.github.io/docs/zh/docs/flashSwap](https://dodoex.github.io/docs/zh/docs/flashSwap) |
